@@ -553,8 +553,10 @@ function tag.attached_connect_signal(screen, ...)
     end
 end
 
--- Register standards signals
-capi.client.connect_signal("manage", function(c, startup)
+--- Manage a client
+-- @param c The client to manage.
+-- @param startup Optional: true if client is starting up
+function tag.manage(c, startup)
     -- If we are not managing this application at startup,
     -- move it to the screen where the mouse is.
     -- We only do it for "normal" windows (i.e. no dock, etc).
@@ -569,8 +571,10 @@ capi.client.connect_signal("manage", function(c, startup)
         end
     end
     c:connect_signal("property::screen", tag.withcurrent)
-end)
+end
 
+-- Register standards signals
+capi.client.connect_signal("manage", tag.manage)
 capi.client.connect_signal("manage", tag.withcurrent)
 
 capi.tag.add_signal("property::hide")

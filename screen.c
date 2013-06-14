@@ -157,6 +157,18 @@ screen_scan_randr(void)
     return false;
 }
 
+static int
+compare_screen_coord(const void *a, const void *b) {
+    const screen_t *sa = (screen_t *)a;
+    const screen_t *sb = (screen_t *)b;
+
+    /* sort order: left to right (x asc), then bottom to top (y desc) */
+
+    int diff = sa->geometry.x - sb->geometry.x;
+
+    return diff ? diff : sb->geometry.y - sb->geometry.y;
+}
+
 static bool
 screen_scan_xinerama(void)
 {
@@ -192,6 +204,10 @@ screen_scan_xinerama(void)
             s.geometry = screen_xsitoarea(xsi[screen]);
             screen_add(s);
         }
+
+        /* Order screens by position */
+        qsort(globalconf.screens.tab, globalconf.screen.len, sizeof(screen_t),
+            compare_screen_coord);
 
         p_delete(&xsq);
 
