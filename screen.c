@@ -206,7 +206,7 @@ screen_scan_xinerama(void)
         }
 
         /* Order screens by position */
-        qsort(globalconf.screens.tab, globalconf.screen.len, sizeof(screen_t),
+        qsort(globalconf.screens.tab, globalconf.screens.len, sizeof(screen_t),
             compare_screen_coord);
 
         p_delete(&xsq);
