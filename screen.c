@@ -205,10 +205,6 @@ screen_scan_xinerama(void)
             screen_add(s);
         }
 
-        /* Order screens by position */
-        qsort(globalconf.screens.tab, globalconf.screens.len, sizeof(screen_t),
-            compare_screen_coord);
-
         p_delete(&xsq);
 
         return true;
@@ -237,6 +233,10 @@ screen_scan(void)
 {
     if(!screen_scan_randr() && !screen_scan_xinerama())
         screen_scan_x11();
+
+    /* Order screens by position */
+    qsort(globalconf.screens.tab, globalconf.screens.len, sizeof(screen_t),
+        compare_screen_coord);
 }
 
 /** Return the Xinerama screen number where the coordinates belongs to.
