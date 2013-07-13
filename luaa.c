@@ -46,6 +46,8 @@
 #include "common/buffer.h"
 #include "common/backtrace.h"
 
+#include <sys/time.h>
+
 #ifdef WITH_DBUS
 extern const struct luaL_Reg awesome_dbus_lib[];
 #endif
@@ -508,6 +510,22 @@ luaA_dofunction_on_error(lua_State *L)
     return 1;
 }
 
+static int
+luaA_gettimeofday(lua_State *L)
+{
+    struct timeval tv;
+    lua_Number num;
+
+    gettimeofday(&tv, 0);
+
+    num = tv.tv_sec;
+    lua_pushnumber(L, num);
+    num = tv.tv_usec;
+    lua_pushnumber(L, num);
+
+    return 2;
+}
+
 /** Initialize the Lua VM
  * \param xdg An xdg handle to use to get XDG basedir.
  */
@@ -530,6 +548,12 @@ luaA_init(xdgHandle* xdg)
         { NULL, NULL }
     };
 
+    static const struct luaL_Reg misc_lib[] =
+    {
+        { "gettimeofday", luaA_gettimeofday },
+        { NULL, NULL }
+    };
+
     L = globalconf.L = luaL_newstate();
 
     /* Set panic function */
@@ -546,6 +570,8 @@ luaA_init(xdgHandle* xdg)
 
     /* Export awesome lib */
     luaA_openlib(L, "awesome", awesome_lib, awesome_lib);
+
+    luaA_openlib(L, "misc", misc_lib, misc_lib);
 
     /* Export root lib */
     luaA_registerlib(L, "root", awesome_root_lib);
