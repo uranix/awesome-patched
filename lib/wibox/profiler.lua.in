@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+-- @author Ivan Tsybulin
+-- @copyright 2013 Ivan Tsybulin
+-- @release @AWESOME_VERSION@
+---------------------------------------------------------------------------
+
+local capi = {
+    misc = misc
+}
+
+local io = {stderr = io.stderr}
+
+local profiler = {}
+profiler.__index = profiler
+
+local function new(msg)
+    local prof = {}
+    setmetatable(prof, profiler)
+    prof.sec, prof.usec = capi.misc.gettimeofday()
+    io.stderr:write(string.format("%s\n", msg));
+    return prof
+end
+
+function profiler:mark(msg)
+    local sec, usec = capi.misc.gettimeofday()
+    local dt = 1e3 * (sec - self.sec) + 1e-3 * (usec - self.usec)
+    io.stderr:write(string.format("+%fms %s\n", dt, msg))
+    self.sec = sec
+    self.usec = usec
+end
+
+return setmetatable(profiler, { __call = function(_, ...) return new(...) end })
+
+-- vim: filetype=lua:expandtab:shiftwidth=4:tabstop=8:softtabstop=4:textwidth=80
